@@ -1,12 +1,16 @@
 package com.example.nrfswarm.manager
 
 import android.content.Context
+import kotlinx.serialization.*
 import android.util.Log
 import com.example.nrfswarm.protocols.UIUpdaterInterface
+import kotlinx.serialization.json.JSON
+import kotlinx.serialization.json.Json
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 import java.util.*
 
+@UseExperimental(ImplicitReflectionSerializer::class)
 class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Context, val uiUpdater: UIUpdaterInterface?) {
 
     private var client = MqttAndroidClient(context,connectionParams.host,connectionParams.clientId + id(context))
@@ -16,6 +20,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
     init {
 
         client.setCallback(object: MqttCallbackExtended {
+
             override fun connectComplete(b:Boolean, s:String) {
                 Log.w("mqtt", s)
                 uiUpdater?.resetUIWithConnection(true)
@@ -24,8 +29,9 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
                 uiUpdater?.resetUIWithConnection(false)
             }
             override fun messageArrived(topic:String, mqttMessage: MqttMessage) {
-                Log.w("Mqtt", mqttMessage.toString())
-                uiUpdater?.update(mqttMessage.toString())
+                val message = mqttMessage.toString()
+                Log.w("MESSAGE", "$message")
+                uiUpdater?.update(message)
             }
             override fun deliveryComplete(iMqttDeliveryToken: IMqttDeliveryToken) {
             }
@@ -140,7 +146,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
     fun publish(message:String){
         try
         {
-            var msg = "Android: " + message
+            val msg = message
             client.publish(this.connectionParams.topic,msg.toByteArray(),0,false,null,object :IMqttActionListener{
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.w("Mqtt", "Publish Success!")

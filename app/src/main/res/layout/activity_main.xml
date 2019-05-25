@@ -37,9 +37,10 @@
             android:ems="10"
             android:id="@+id/ipAddressField" android:layout_marginStart="16dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
-            android:layout_marginTop="24dp" app:layout_constraintTop_toBottomOf="@+id/statusLabl"
+            android:layout_marginTop="16dp" app:layout_constraintTop_toBottomOf="@+id/statusLabl"
             android:layout_marginEnd="8dp" app:layout_constraintEnd_toStartOf="@+id/connectBtn"
-            android:layout_marginRight="8dp" android:hint="IP Address / DNS"/>
+            android:layout_marginRight="8dp" android:hint="IP Address / DNS"
+    />
     <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -49,18 +50,19 @@
             app:layout_constraintTop_toBottomOf="@+id/ipAddressField" android:layout_marginStart="16dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
             android:layout_marginEnd="8dp" app:layout_constraintEnd_toStartOf="@+id/connectBtn"
-            android:layout_marginRight="8dp" android:hint="Topic Field"/>
+            android:layout_marginRight="8dp" android:hint="Topic Field" android:text="nrfswarm"/>
     <EditText
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="100dp"
             android:inputType="textMultiLine"
             android:ems="10"
-            android:id="@+id/messageHistoryView" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/topicField" android:layout_marginStart="16dp"
+            android:id="@+id/messageHistoryView"
+            android:layout_marginStart="16dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp" app:layout_constraintBottom_toTopOf="@+id/messageField"/>
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@+id/divider"
+            android:layout_marginTop="8dp" android:layout_marginEnd="16dp" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginRight="16dp"/>
     <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -71,5 +73,45 @@
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
             android:layout_marginEnd="8dp" app:layout_constraintEnd_toStartOf="@+id/sendBtn"
             android:layout_marginRight="8dp" android:hint="Type Message ..."/>
+    <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/messageLine"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="16dp" android:layout_marginStart="16dp"
+            android:textSize="22sp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/messageHistoryView"
+            app:layout_constraintEnd_toStartOf="@+id/clearBtn" android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"/>
+
+    <com.jjoe64.graphview.GraphView android:layout_width="match_parent" android:layout_height="0dp"
+                                    android:layout_marginTop="8dp"
+                                    app:layout_constraintTop_toBottomOf="@+id/messageLine"
+                                    android:layout_marginBottom="16dp"
+                                    app:layout_constraintBottom_toTopOf="@+id/messageField" android:id="@+id/graph_view"
+                                    app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+                                    android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent"
+                                    android:layout_marginRight="8dp" android:layout_marginEnd="8dp"/>
+    <Button
+            android:text="Clear"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:background="#FF3300"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="16dp" android:layout_marginRight="16dp" android:id="@+id/clearBtn"
+            android:onClick="clear"
+            app:layout_constraintBottom_toBottomOf="@+id/messageLine"
+            app:layout_constraintTop_toTopOf="@+id/messageLine"/>
+    <View
+            android:id="@+id/divider"
+            android:layout_width="395dp"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/topicField"
+            android:layout_marginTop="8dp" android:layout_marginLeft="8dp" android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp" android:layout_marginEnd="8dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
