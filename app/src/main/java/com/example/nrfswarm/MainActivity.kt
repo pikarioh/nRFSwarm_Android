@@ -1,6 +1,5 @@
 package com.example.nrfswarm
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -11,27 +10,30 @@ import com.example.nrfswarm.protocols.UIUpdaterInterface
 import com.google.gson.GsonBuilder
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
-import com.jjoe64.graphview.series.DataPointInterface
-import com.jjoe64.graphview.series.LineGraphSeries
 import com.jjoe64.graphview.series.PointsGraphSeries
 import kotlinx.android.synthetic.main.activity_main.*
-import androidx.core.view.ViewCompat.setX
-import androidx.core.view.ViewCompat.setY
 
+/*
+* nRF Swarm 1.1
+* Bachelor thesis's app project for MQTT messaging
+* Developed by the nRF Swarm Group
+* Last modification date: 27th May 2019
+ */
 
-
-
+// Main Activity
 
 class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
+    // Global values initiations
     var mqttManager: MQTTmanager? = null
-
     var graph: GraphView? = null
     var xySeries: PointsGraphSeries<DataPoint>? = null
     private var xyValueArray: ArrayList<XYValue>? = null
 
     // Interface methods
+
     override fun resetUIWithConnection(status: Boolean) {
+        // This method enable/disable the views on the layout
 
         ipAddressField.isEnabled  = !status
         topicField.isEnabled      = !status
@@ -49,29 +51,37 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     }
 
     override fun updateStatusViewWith(status: String) {
+        // The method updates status on the statusLabl-bar
         statusLabl.text = status
     }
 
     override fun update(message: String) {
+        // This method updates that messageHistoryView with MQTT messages
 
+        // Convert raw text to string
         var text = messageHistoryView.text.toString()
         var newText = """
             $text
             $message
             """
-        //var newText = text.toString() + "\n" + message +  "\n"
+        // Refresh the text history by add new incoming messages to the old one and apply
         messageHistoryView.setText(newText)
         messageHistoryView.setSelection(messageHistoryView.text.length)
 
+        // Find Graph view
         graph = findViewById<GraphView>(R.id.graph_view)
-        val gson = GsonBuilder().create().fromJson(message, Position::class.java)
 
+        // Initiate GSON (JSON Parser) and display the parsed value on the layout
+        val gson = GsonBuilder().create().fromJson(message, Position::class.java)
         messageLine.text = "X: ${gson.x} // Y: ${gson.y}"
 
+        // Draw the point from JSON data on the graph view and log the result
         xyValueArray?.add(XYValue(gson.x, gson.y))
         init()
         Log.d("POSITION ADDED", "X: ${gson.x} , Y: ${gson.y}")
     }
+
+    // Overriding lifecycle methods
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,23 +97,28 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         init()
     }
 
+    // Custom layout controller methods
+
     private fun init() {
-        //declare the xySeries Object
+        // Graph initiator
+
+        // Declare the xySeries Object
         xySeries = PointsGraphSeries()
 
-        //little bit of exception handling for if there is no data.
+        // Øittle bit of exception handling for if there is no data.
         if (xyValueArray?.size !== 0) {
             createScatterPlot()
         } else { }
     }
 
     private fun createScatterPlot() {
+        // Graph plot creator
         Log.d("GRAPH VIEW", "createScatterPlot: Creating scatter plot.")
 
-        //sort the array of xy values
+        // Sort the array of xy values
         xyValueArray = xyValueArray?.let { sortArray(it) }
 
-        //add the data to the series
+        // Add the data to the series
         for (i in 0 until xyValueArray?.size!!) {
             try {
                 val x = xyValueArray?.get(i)?.x!!.toDouble()
@@ -115,23 +130,23 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
         }
 
-        //set some properties
+        // Set some properties
         xySeries?.setShape(PointsGraphSeries.Shape.POINT);
         //xySeries.setColor(Color.BLUE);
         xySeries?.setSize(20f);
 
-        //set Scrollable and Scaleable
+        // Set Scrollable and Scaleable
         graph?.viewport?.isScalable = true
         graph?.viewport?.isScrollable = true
         graph?.viewport?.setScalableY(true)
         graph?.viewport?.setScrollableY(true)
 
-        //set manual y bounds
+        // Set manual y bounds
         graph?.viewport?.setMaxY(500.0)
         graph?.viewport?.setMinY(-500.0)
         graph?.viewport?.isYAxisBoundsManual = true
 
-        //set manual x bounds
+        // Set manual x bounds
         graph?.viewport?.setMaxX(500.0)
         graph?.viewport?.setMinX(-500.0)
         graph?.viewport?.isXAxisBoundsManual = true
@@ -141,7 +156,7 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
 
     private fun sortArray(array: ArrayList<XYValue>): ArrayList<XYValue> {
         /*
-        //Sorts the xyValues in Ascending order to prepare them for the PointsGraphSeries<DataSet>
+        // Sorts the xyValues in Ascending order to prepare them for the PointsGraphSeries<DataSet>
          */
         val factor = Integer.parseInt(Math.round(Math.pow(array.size.toDouble(), 2.0)).toString())
         var m = array.size - 1
@@ -156,10 +171,10 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
             }
             Log.d("GRAPH VIEW", "sortArray: m = $m")
             try {
-                //print out the y entrys so we know what the order looks like
-                //Log.d(TAG, "sortArray: Order:");
-                //for(int n = 0;n < array.size();n++){
-                //Log.d(TAG, "sortArray: " + array.get(n).getY());
+                // Print out the y entrys so we know what the order looks like
+                // Log.d(TAG, "sortArray: Order:");
+                // for(int n = 0;n < array.size();n++){
+                // Log.d(TAG, "sortArray: " + array.get(n).getY());
                 //}
                 val tempY = array[m - 1].y
                 val tempX = array[m - 1].x
@@ -191,9 +206,10 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
         return array
     }
 
+    // Button methods
 
     fun connect(view: View){
-
+        // This method establish the MQTT connection when pressed
         if (!(ipAddressField.text.isNullOrEmpty() && topicField.text.isNullOrEmpty())) {
             var host = "tcp://" + ipAddressField.text.toString() + ":1883"
             var topic = topicField.text.toString()
@@ -207,18 +223,20 @@ class MainActivity : AppCompatActivity(), UIUpdaterInterface {
     }
 
     fun clear(view: View){
+        // Clear the graph when pressed "Clear" button
         graph?.removeAllSeries()
         xyValueArray = ArrayList()
         xySeries = null
     }
 
     fun sendMessage(view: View){
-
+        //The method copies the message from the messageField to publication
         mqttManager?.publish(messageField.text.toString())
-
         messageField.setText("")
     }
 }
+
+// Necessary classes used in the Main Activity regarding plotting and JSON class
 
 class Position(val x: Double, val y: Double)
 

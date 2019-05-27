@@ -10,13 +10,16 @@ import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 import java.util.*
 
-@UseExperimental(ImplicitReflectionSerializer::class)
+// MQTT Manager class
+
 class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Context, val uiUpdater: UIUpdaterInterface?) {
 
+    // Global value initiations
     private var client = MqttAndroidClient(context,connectionParams.host,connectionParams.clientId + id(context))
     private var uniqueID:String? = null
     private val PREF_UNIQUE_ID = "PREF_UNIQUE_ID"
 
+    // MQTT callback setup
     init {
 
         client.setCallback(object: MqttCallbackExtended {
@@ -37,12 +40,19 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
             }
         })
     }
+
+    // 'Real' MQTT connect method
     fun connect(){
         val mqttConnectOptions = MqttConnectOptions()
         mqttConnectOptions.setAutomaticReconnect(true)
         mqttConnectOptions.setCleanSession(false)
-        //mqttConnectOptions.setUserName(this.connectionParams.username)
-        //mqttConnectOptions.setPassword(this.connectionParams.password.toCharArray())
+
+        // Utilise commented lines below to set up username and password system
+        /*
+        mqttConnectOptions.setUserName(this.connectionParams.username)
+        /mqttConnectOptions.setPassword(this.connectionParams.password.toCharArray())
+        */
+
         try
         {
             var params = this.connectionParams
@@ -67,6 +77,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
         }
     }
 
+    // Disconnect method (unused)
     fun disconnect(){
         try {
             client.disconnect(null,object :IMqttActionListener{
@@ -120,7 +131,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
         }
     }
 
-    // Unsubscribe the topic
+    // Unsubscribe the topic (unused)
     fun unsubscribe(topic: String){
 
         try
@@ -143,6 +154,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
 
     }
 
+    // MQTT Publish method
     fun publish(message:String){
         try
         {
@@ -166,6 +178,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
         }
     }
 
+    // Unique ID generator
     @Synchronized fun id(context:Context):String {
         if (uniqueID == null)
         {
@@ -185,6 +198,6 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
 
 }
 
-data class MQTTConnectionParams(val clientId:String, val host: String, val topic: String, val username: String, val password: String){
+// MQTT connection parameters class
 
-}
+data class MQTTConnectionParams(val clientId:String, val host: String, val topic: String, val username: String, val password: String){}
